@@ -99,7 +99,10 @@ const syncRecords = (ym: string, day: string) => {
         </view>
 
         <view class="record-list">
-            {{ recordList }}
+            <view class="list-title">表头</view>
+            <view class="list-items">
+                列表 {{ recordList }}
+            </view>
         </view>
 
         <NumberKeyboard
@@ -196,8 +199,9 @@ const syncRecords = (ym: string, day: string) => {
 
     .record-list {
         position: relative;
-        width: 100%;
+        width: calc(100% - 1.5rem);
         height: calc(100% - 27rem);
+        padding: 0 0.75rem;
         border-radius: 0.5rem;
         box-shadow: 5px 5px 5px #ddd;
     }

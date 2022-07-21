@@ -2,6 +2,7 @@
 import { computed, onMounted, ref } from "vue";
 import { getStorageInfo, showToast } from "@tarojs/taro";
 import { Button as NutButton, CircleProgress } from "@nutui/nutui-taro";
+import { jumpTo } from "../scripts";
 
 type DetectStateEnum = 'free' | 'block'
 type StorageInfoType = {
@@ -76,10 +77,10 @@ onMounted(() => {
             <text>总可用: {{ storageInfo.total }}</text>
         </view>
         <view class="operate-buttons">
-            <NutButton size="mini" @click="syncStorageInfo(true)">
+            <NutButton size="mini" @tap="syncStorageInfo(true)">
                 {{ detectState === 'free' ? '重新检测' : '检测中 . .' }}
             </NutButton>
-            <NutButton size="mini">使用导出</NutButton>
+            <NutButton size="mini" @tap="jumpTo('output')">使用导出</NutButton>
         </view>
     </view>
 </template>

@@ -4,7 +4,7 @@ import { clearStorage, getStorage, removeStorage, setStorage } from "@tarojs/tar
 /**
  * @description single record
  */
-type SingleRecord = {
+export type SingleRecord = {
     /**
      * @description timestamp
      */
@@ -21,15 +21,15 @@ type SingleRecord = {
 /**
  * @description records of a day
  */
-type DayRecord = SingleRecord[]
+export type DayRecord = SingleRecord[]
 /**
  * @description records of a month
  */
-type MonthRecord = { [day: number]: DayRecord } | null
+export type MonthRecord = { [day: number]: DayRecord } | null
 /**
  * @description records of a year
  */
-type YearRecord = MonthRecord[]
+export type YearRecord = MonthRecord[]
 // endregion
 
 /**

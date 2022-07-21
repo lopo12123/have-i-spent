@@ -88,9 +88,8 @@ onMounted(() => {
 <style lang="scss">
 .storage-info {
     position: relative;
-    width: calc(100% - 1rem);
+    width: 100%;
     height: 5rem;
-    margin: 0 0.5rem;
     border-radius: 0.5rem;
     color: #777;
     font-size: 0.75rem;

@@ -92,7 +92,6 @@ onMounted(() => {
     height: 5rem;
     border-radius: 0.5rem;
     color: #777;
-    font-size: 0.75rem;
     box-shadow: 5px 5px 5px #ccc;
     display: flex;
     align-items: center;

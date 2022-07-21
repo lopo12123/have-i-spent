@@ -92,7 +92,7 @@ onMounted(() => {
     height: 5rem;
     border-radius: 0.5rem;
     color: #777;
-    box-shadow: 5px 5px 5px #ccc;
+    box-shadow: 5px 5px 5px #ddd;
     display: flex;
     align-items: center;
     justify-content: space-evenly;

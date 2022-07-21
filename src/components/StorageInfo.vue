@@ -2,7 +2,7 @@
 import { computed, onMounted, ref } from "vue";
 import { getStorageInfo, showToast } from "@tarojs/taro";
 import { Button as NutButton, CircleProgress } from "@nutui/nutui-taro";
-import { jumpTo } from "../scripts";
+import { jumpTo } from "../scripts/route";
 
 type DetectStateEnum = 'free' | 'block'
 type StorageInfoType = {

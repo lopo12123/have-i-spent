@@ -136,7 +136,7 @@ const syncRecords = (ym: string, day: string) => {
     // 5rem
     // StorageInfo
 
-    // 6rem
+    // 9rem
     .new-record-box {
         position: relative;
         width: 100%;
@@ -173,6 +173,7 @@ const syncRecords = (ym: string, day: string) => {
         }
     }
 
+    // 3rem
     .date-picker {
         position: relative;
         width: calc(100% - 1.5rem);
@@ -196,7 +197,7 @@ const syncRecords = (ym: string, day: string) => {
     .record-list {
         position: relative;
         width: 100%;
-        height: calc(100% - 30rem);
+        height: calc(100% - 27rem);
         border-radius: 0.5rem;
         box-shadow: 5px 5px 5px #ddd;
     }

@@ -44,7 +44,7 @@ onMounted(() => {
         <view class="filter-box">
             <view class="pick-box">
                 <text class="label">选择年</text>
-                <scroll-view class="item-box">
+                <scroll-view class="item-box" :scroll-x="true">
                     <view :class="if_select ? 'active' : 'default'"
                           v-for="(if_select, year) in optional_years" :key="`year-${year}`"
                           @tap="optional_years[year] = !if_select">
@@ -54,7 +54,7 @@ onMounted(() => {
             </view>
             <view class="pick-box">
                 <text class="label">选择月</text>
-                <scroll-view class="item-box">
+                <scroll-view class="item-box" :scroll-x="true">
                     <view :class="if_select ? 'active' : 'default'"
                           v-for="(if_select, month) in optional_months" :key="`month-${month}`"
                           @tap="optional_months[month] = !if_select">
@@ -64,7 +64,7 @@ onMounted(() => {
             </view>
             <view class="pick-box">
                 <text class="label">选择日</text>
-                <scroll-view class="item-box">
+                <scroll-view class="item-box" :scroll-x="true">
                     <view :class="if_select ? 'active' : 'default'"
                           v-for="(if_select, date) in optional_dates" :key="`date-${date}`"
                           @tap="optional_dates[date] = !if_select">

@@ -1,25 +1,35 @@
 <script lang="ts" setup>
 import { ref } from "vue";
-import { Button as NutButton, Calendar, Cell as NutCell, NumberKeyboard, Input as NutInput } from "@nutui/nutui-taro";
+import {
+    Button as NutButton,
+    Cell as NutCell,
+    NumberKeyboard,
+    Input as NutInput,
+    DatePicker
+} from "@nutui/nutui-taro";
 import { DayRecord, getMonthRecord } from "../../scripts/store";
 import StorageInfo from "../../components/StorageInfo.vue";
 import { hideLoading, showLoading, showToast } from "@tarojs/taro";
 
-// region 日期选择器
+// region 日期选择器 级联
 const weekDays = [ '星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六' ]
-// 日历可见性
+const defaultDate = new Date()
+// 可见性
 const calendarVisible = ref(false)
 // 日历绑定日期
 const showDate = ref(new Date().toLocaleDateString().replace(/\//g, '-'))
 // 展示星期几
 const showDay = ref(weekDays[new Date().getDay()])
-// 点击日历回调 dateArray: [year, month, date, yyyy-mm-dd, day]
-const setShowDate = (dateArray: string[]) => {
-    console.log(dateArray)
+// 确认选择
+const confirmPick = (pickObj) => {
+    const { selectedOptions, selectedValue } = pickObj
 
-    showDate.value = dateArray[3]
-    showDay.value = dateArray[4]
-    syncRecords(dateArray[0].toString() + parseInt(dateArray[1]), parseInt(dateArray[2]) + '')
+    showDate.value = selectedOptions
+        .map(option => option.value)
+        .join('-')
+    showDay.value = weekDays[new Date(showDate.value).getDay()]
+
+    syncRecords(selectedValue[0] + (parseInt(selectedValue[1]).toString()), parseInt(selectedValue[2]).toString())
 }
 // endregion
 
@@ -113,14 +123,13 @@ const syncRecords = (ym: string, day: string) => {
             :custom-key="['-', '.']"
             @close="keyboardVisible = false"/>
 
-        <Calendar title="选择日期"
-                  v-model:visible="calendarVisible"
-                  :is-auto-back-fill="true"
-                  :default-value="showDate"
-                  start-date="2022-01-01"
-                  :end-date="new Date().toLocaleDateString().replace(/\//g, '-')"
-                  @close="calendarVisible = false"
-                  @choose="setShowDate"/>
+        <DatePicker
+            v-model="defaultDate"
+            v-model:visible="calendarVisible"
+            :is-show-chinese="true"
+            :min-date="new Date(new Date().getFullYear() - 1, 0, 1)"
+            :max-date="new Date()"
+            @confirm="confirmPick"/>
     </view>
 </template>
 

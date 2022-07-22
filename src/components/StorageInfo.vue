@@ -74,7 +74,7 @@ onMounted(() => {
                 radius="32" stroke-width="10"/>
         </view>
         <view class="text-of-usage">
-            <text>日志存储空间占用</text>
+            <text>存储空间占用</text>
             <text>已使用: {{ storageInfo.used }}</text>
             <text>总可用: {{ storageInfo.total }}</text>
         </view>
@@ -82,7 +82,7 @@ onMounted(() => {
             <NutButton size="mini" @tap="syncStorageInfo(true)">
                 {{ detectState === 'free' ? '重新检测' : '检测中 . .' }}
             </NutButton>
-            <NutButton size="mini" @tap="jumpTo('overview')">日志管理</NutButton>
+            <NutButton size="mini" @tap="jumpTo('overview')">记录查询</NutButton>
         </view>
     </view>
 </template>

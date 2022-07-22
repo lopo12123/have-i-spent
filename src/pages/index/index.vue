@@ -72,7 +72,8 @@ const addNewRecord = () => {
                         // 记录成功后清空输入区域
                         resetRecordItem(false)
                         // 记录后 更新列表
-                        syncRecords(undefined, undefined, false)
+                        const [ yyyy, MM, dd ] = showDate.value.split('-').map(x => parseInt(x).toString())
+                        syncRecords(dd, yyyy + MM, false)
                     }
                 })
         }
@@ -149,7 +150,7 @@ onMounted(() => {
 
         <view class="date-picker" @tap="calendarVisible = true">
             <text class="value">{{ showDate }} / {{ showDay }}</text>
-            <text class="label">点击切换日期</text>
+            <text class="label">点击切换查看日期</text>
         </view>
 
         <view class="record-list">

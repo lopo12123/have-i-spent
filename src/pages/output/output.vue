@@ -118,7 +118,6 @@ onMounted(() => {
             }
 
             .item-box {
-                outline: solid 1px #ccc;
                 position: relative;
                 width: calc(100% - 3rem);
                 height: 1.5rem;
@@ -140,7 +139,7 @@ onMounted(() => {
 
                 .active {
                     @extend %pick-item;
-                    background-color: #00cd65;
+                    background-color: #00cd65cc;
                     color: #fff;
                 }
 

@@ -62,14 +62,12 @@ const doOperate = (selectAll: boolean) => {
 const doFilter = () => {
     const _all: YMDRecords[] = JSON.parse(JSON.stringify(allRecords.value))
     const filteredYears = Object.keys(optional_years.value).filter(y => optional_years.value[y])
-    const filteredMonths = Object.keys(optional_months.value).filter(m => optional_years.value[m])
-    const filteredDates = Object.keys(optional_dates.value).filter(d => optional_years.value[d])
+    const filteredMonths = Object.keys(optional_months.value).filter(m => optional_months.value[m])
+    const filteredDates = Object.keys(optional_dates.value).filter(d => optional_dates.value[d])
 
     recordList.value = _all
         .filter(ymd => {
-            return filteredYears.includes(ymd.year)
-                || filteredMonths.includes(ymd.month)
-                || filteredDates.includes(ymd.date)
+            return filteredYears.includes(ymd.year + '') || filteredMonths.includes(ymd.month + '') || filteredDates.includes(ymd.date + '')
         })
         .map(ymd => ymd.records)
         .flat(1)
@@ -129,9 +127,9 @@ onMounted(() => {
                 </scroll-view>
             </view>
             <view class="operate-box">
-                <view class="operate-btn default" @tap="doOperate(true)">全选</view>
-                <view class="operate-btn default" @tap="doOperate(false)">全不选</view>
-                <view class="operate-btn confirm" @tap="doFilter">条件筛选</view>
+                <view class="operate-btn none" @tap="doOperate(false)">全不选</view>
+                <view class="operate-btn all" @tap="doOperate(true)">全选</view>
+                <view class="operate-btn confirm" @tap="doFilter">按条件筛选</view>
             </view>
         </view>
 
@@ -216,9 +214,14 @@ onMounted(() => {
                 }
             }
 
-            .default {
-                border: solid 1px #aaa;
+            .none {
+                border: solid 1px #777c;
                 color: #777;
+            }
+
+            .all {
+                border: solid 1px #ffa70dcc;
+                color: #ffa70d;
             }
 
             .confirm {

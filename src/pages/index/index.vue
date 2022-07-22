@@ -111,18 +111,18 @@ onMounted(() => {
         <view class="new-record-box">
             <NutCell class="value-box" title="金额" :desc="newValue"
                      :round-radius="0"
-                     @click="keyboardVisible = true"/>
+                     @tap="keyboardVisible = true"/>
             <NutInput class="note-box" v-model="newNote"
                       placeholder="备注(可选)"
                       show-word-limit
                       max-length="10"/>
             <view class="operate-box">
                 <NutButton class="op-btn" size="small"
-                           @click="resetRecordItem">
+                           @tap="resetRecordItem">
                     重置
                 </NutButton>
                 <NutButton class="op-btn" size="small"
-                           @click="addNewRecord">
+                           @tap="addNewRecord">
                     记录
                 </NutButton>
             </view>

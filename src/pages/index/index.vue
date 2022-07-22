@@ -309,6 +309,7 @@ onMounted(() => {
                     width: 4rem;
                     color: #777;
                     font-style: italic;
+                    text-align: end;
                 }
             }
 

@@ -34,7 +34,9 @@ const syncStorageInfo = (if_toast: boolean = false) => {
     else {
         detectState.value = 'block'
         getStorageInfo()
-            .then(({ currentSize, limitSize }) => {
+            .then((infos) => {
+                // ! .d.ts有问题, 这里只能这样了
+                const { currentSize, limitSize } = infos as unknown as { currentSize: number, limitSize: number }
                 storageInfo.value.used = currentSize < 1024 ? `${ currentSize.toFixed(2) }KB` : `${ (currentSize / 1024).toFixed(2) }MB`
                 storageInfo.value.total = limitSize < 1024 ? `${ limitSize.toFixed(2) }KB` : `${ (limitSize / 1024).toFixed(2) }MB`
                 storageInfo.value.percent = parseFloat((currentSize * 100 / limitSize).toFixed(2))

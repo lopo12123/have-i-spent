@@ -1,4 +1,4 @@
-import { clearStorage, getStorage, removeStorage, setStorage } from "@tarojs/taro";
+import { clearStorage, getStorage, getStorageInfo, removeStorage, setStorage } from "@tarojs/taro";
 
 // region Types of Records
 /**
@@ -25,11 +25,20 @@ export type DayRecord = SingleRecord[]
 /**
  * @description records of a month
  */
-export type MonthRecord = { [day: number]: DayRecord } | null
+export type MonthRecord = { [date: string]: DayRecord } | null
 /**
  * @description records of a year
  */
 export type YearRecord = MonthRecord[]
+/**
+ * @description year month date records
+ */
+export type YMDRecords = {
+    year: string
+    month: string
+    date: string
+    records: DayRecord
+}
 // endregion
 
 /**
@@ -89,6 +98,45 @@ const getYearRecord = (year?: string) => {
                 resolve(month_records)
             })
             .catch(reject)
+    })
+}
+
+/**
+ * @description Get all records in the storage
+ */
+const getAllRecord = () => {
+    return new Promise<YMDRecords[]>(outerResolve => {
+        getStorageInfo()
+            .then((storageInfo) => {
+                const storageKeys = (storageInfo as unknown as { keys: string[] }).keys
+                return Promise.all(storageKeys.map(ym => {
+                    return new Promise<{ ym: string, month_record: MonthRecord }>(resolve => {
+                        getMonthRecord(ym)
+                            .then(month_record => {
+                                resolve({ ym, month_record })
+                            })
+                    })
+                }))
+            })
+            .then(ym_records => {
+                const _all: YMDRecords[] = []
+                ym_records.forEach(({ ym, month_record }) => {
+                    if(month_record !== null) {
+                        for (let date in month_record) {
+                            _all.push({
+                                year: ym.slice(0, 4),
+                                month: ym.slice(4),
+                                date,
+                                records: month_record[date]
+                            })
+                        }
+                    }
+                })
+                outerResolve(_all)
+            })
+            .catch(() => {
+                outerResolve([])
+            })
     })
 }
 
@@ -184,6 +232,7 @@ export {
     getDateIdx,
     getMonthRecord,
     getYearRecord,
+    getAllRecord,
     insertOrCreate,
     clearMonthRecords,
     clearYearRecords,

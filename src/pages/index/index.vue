@@ -29,7 +29,7 @@ const confirmPick = (pickObj) => {
         .join('-')
     showDay.value = weekDays[new Date(showDate.value).getDay()]
 
-    syncRecords(selectedValue[0] + (parseInt(selectedValue[1]).toString()), parseInt(selectedValue[2]).toString())
+    syncRecords(parseInt(selectedValue[2]).toString(), selectedValue[0] + (parseInt(selectedValue[1]).toString()))
 }
 // endregion
 
@@ -41,10 +41,11 @@ const newValue = ref('')
 // 备注
 const newNote = ref('')
 // 重置
-const resetRecordItem = () => {
+const resetRecordItem = (if_toast: boolean = true) => {
     newValue.value = ''
     newNote.value = ''
-    showToast({
+
+    if(if_toast) showToast({
         title: '重置成功',
         icon: 'success'
     })
@@ -60,11 +61,16 @@ const addNewRecord = () => {
     else {
         insertOrCreate(newValue.value, newNote.value)
             .then(if_success => {
-                if(if_success) resetRecordItem()
                 showToast({
                     title: if_success ? '记录成功' : '记录失败',
                     icon: 'success'
                 })
+                if(if_success) {
+                    // 记录成功后清空输入区域
+                    resetRecordItem(false)
+                    // 记录后 更新列表
+                    syncRecords(undefined, undefined, false)
+                }
             })
     }
 }
@@ -73,24 +79,28 @@ const addNewRecord = () => {
 // region 记录展示
 const recordList = ref<DayRecord>([])
 const recordState = ref<'free' | 'block'>('free')
-const syncRecords = (ym: string, date: string) => {
-    showLoading({
+const syncRecords = (date?: string, ym?: string, if_toast: boolean = true) => {
+    if(if_toast) showLoading({
         title: '查询中',
         mask: true,
         complete: () => {
-            getMonthRecord(ym)
+            getMonthRecord(ym ?? getDateIdx('ym'))
                 .then(records => {
-                    recordList.value = records?.[date] ?? []
+                    recordList.value = records?.[date ?? getDateIdx('date')] ?? []
                     hideLoading()
                 })
         }
     })
+    else getMonthRecord(ym ?? getDateIdx('ym'))
+        .then(records => {
+            recordList.value = records?.[date ?? getDateIdx('date')] ?? []
+        })
 }
 // endregion
 
 onMounted(() => {
     // 进入页面自动同步一次
-    syncRecords(getDateIdx('ym'), getDateIdx('date'))
+    syncRecords()
 })
 </script>
 
@@ -103,7 +113,9 @@ onMounted(() => {
                      :round-radius="0"
                      @click="keyboardVisible = true"/>
             <NutInput class="note-box" v-model="newNote"
-                      placeholder="备注(可选)"/>
+                      placeholder="备注(可选)"
+                      show-word-limit
+                      max-length="10"/>
             <view class="operate-box">
                 <NutButton class="op-btn" size="small"
                            @click="resetRecordItem">
@@ -122,9 +134,25 @@ onMounted(() => {
         </view>
 
         <view class="record-list">
-            <view class="list-title">表头</view>
-            <view class="list-items">
-                列表 {{ recordList }}
+            <view class="list-banner">
+                {{ recordList.length }}
+                条记录, 共
+                {{ recordList.reduce((prev, curr) => prev + parseFloat(curr.v + ''), 0).toFixed(2) }}
+                元
+            </view>
+            <view class="list-container">
+                <view class="list-item" :key="item.t"
+                      v-for="(item, idx) in recordList">
+                    <text class="index">{{ idx + 1 }}</text>
+                    <text class="value">{{ item.v }}</text>
+                    <text class="note">{{ item.n }}</text>
+                    <text class="timestamp">
+                        {{ new Date(parseInt(item.t + '')).toLocaleTimeString('zh-cn', {hour12: false}) }}
+                    </text>
+                </view>
+                <view v-if="recordList.length === 0" class="empty-text">
+                    今天没花钱, 好好反思一下
+                </view>
             </view>
         </view>
 
@@ -182,6 +210,18 @@ onMounted(() => {
             padding: 13px 16px;
             border-bottom: solid 1px #eee;
             color: #777;
+
+            .nut-input-word-limit {
+                position: absolute;
+                width: fit-content;
+                height: 3rem;
+                margin: 0;
+                top: 0;
+                right: 0.5rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
         }
 
         .operate-box {
@@ -221,11 +261,66 @@ onMounted(() => {
 
     .record-list {
         position: relative;
-        width: calc(100% - 1.5rem);
-        height: calc(100% - 27rem);
-        padding: 0 0.75rem;
+        width: 100%;
+        height: calc(100% - 20rem);
         border-radius: 0.5rem;
         box-shadow: 5px 5px 5px #ddd;
+
+        .list-banner {
+            position: relative;
+            width: calc(100% - 1.5rem);
+            height: 1rem;
+            padding: 0 0.75rem;
+            color: #777;
+            line-height: 1rem;
+            text-align: end;
+        }
+
+        .list-container {
+            position: relative;
+            width: calc(100% - 1.5rem);
+            padding: 0 0.75rem;
+            height: calc(100% - 1rem);
+            overflow: hidden auto;
+
+            .list-item {
+                position: relative;
+                width: 100%;
+                height: 2rem;
+                border-bottom: solid 1px #eee;
+                color: #333;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+
+                .index {
+                    width: 1rem;
+                }
+
+                .value {
+                    width: 3rem;
+                }
+
+                .note {
+                    width: calc(100% - 10rem);
+                }
+
+                .timestamp {
+                    width: 4rem;
+                    color: #777;
+                    font-style: italic;
+                }
+            }
+
+            .empty-text {
+                position: relative;
+                width: 100%;
+                height: 3rem;
+                color: #7778;
+                line-height: 3rem;
+                text-align: center;
+            }
+        }
     }
 }
 </style>

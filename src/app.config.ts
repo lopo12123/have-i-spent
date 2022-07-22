@@ -1,4 +1,5 @@
 export default defineAppConfig({
+    lazyCodeLoading: "requiredComponents",
     pages: [
         'pages/index/index',
         'pages/overview/overview',
@@ -8,5 +9,5 @@ export default defineAppConfig({
         navigationBarBackgroundColor: '#fff',
         navigationBarTitleText: 'WeChat',
         navigationBarTextStyle: 'black'
-    }
+    },
 })

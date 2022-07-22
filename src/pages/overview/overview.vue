@@ -14,6 +14,8 @@ const optional_years = ref<OptionalItem>({})
 const optional_months = ref<OptionalItem>({})
 // 可选日期
 const optional_dates = ref<OptionalItem>({})
+// 金额范围
+// const value_range = ref()
 // 展示数据
 const recordList = ref<SingleRecord[]>([])
 const in_out = computed(() => {
@@ -126,6 +128,14 @@ onMounted(() => {
                     </view>
                 </scroll-view>
             </view>
+<!--            <view class="pick-box">-->
+<!--                <text class="label">金额量</text>-->
+<!--                <view class="item-box">-->
+<!--                    <text>大于</text>-->
+<!--                    <input type="number">-->
+<!--                    <text>小于</text>-->
+<!--                </view>-->
+<!--            </view>-->
             <view class="operate-box">
                 <view class="operate-btn none" @tap="doOperate(false)">全不选</view>
                 <view class="operate-btn all" @tap="doOperate(true)">全选</view>

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import {
     Button as NutButton,
     Cell as NutCell,
@@ -78,6 +78,15 @@ const addNewRecord = () => {
 
 // region 记录展示
 const recordList = ref<DayRecord>([])
+const in_out = computed(() => {
+    const [ i, o ] = recordList.value
+        .reduce(([ prev_i, prev_o ], curr) => {
+            const v = parseFloat(curr.v + '')
+            return v > 0 ? [ prev_i + v, prev_o ] : [ prev_i, prev_o - v ]
+        }, [ 0, 0 ])
+
+    return [ i, o ]
+})
 const recordState = ref<'free' | 'block'>('free')
 const syncRecords = (date?: string, ym?: string, if_toast: boolean = true) => {
     if(if_toast) showLoading({
@@ -135,10 +144,15 @@ onMounted(() => {
 
         <view class="record-list">
             <view class="list-banner">
+                共
                 {{ recordList.length }}
-                条记录, 共
-                {{ recordList.reduce((prev, curr) => prev + parseFloat(curr.v + ''), 0).toFixed(2) }}
-                元
+                条记录 (收
+                {{ in_out[0].toFixed(2) }}
+                , 支
+                {{ in_out[1].toFixed(2) }}
+                , 合计
+                {{ (in_out[0] - in_out[1]).toFixed(2) }}
+                )
             </view>
             <view class="list-container">
                 <view class="list-item" :key="item.t"

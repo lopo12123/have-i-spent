@@ -1,10 +1,10 @@
 import { navigateTo } from "@tarojs/taro";
 
-export type ValidPageName = 'index' | 'output'
+export type ValidPageName = 'index' | 'overview'
 
 const Mapper: { [k in ValidPageName]: string } = {
     index: '/pages/index/index',
-    output: '/pages/output/output',
+    overview: '/pages/overview/overview',
 }
 
 export const jumpTo = (pageName: ValidPageName) => {

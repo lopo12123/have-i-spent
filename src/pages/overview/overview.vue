@@ -1,26 +1,25 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue";
-import { getAllRecord, YMDRecords } from "../../scripts/store";
+import { getAllRecord, insertOrCreate, YMDRecords } from "../../scripts/store";
 
 type OptionalItem = { [value: string]: boolean }
 
 // region 筛选查看
-// 总览面板状态: 初始化 计算中 空闲
-const overviewStatus = ref<'init' | 'calc' | 'free'>('init')
+// 全部数据
+const allRecords = ref<YMDRecords[]>([])
 // 可选年份
 const optional_years = ref<OptionalItem>({})
 // 可选月份
 const optional_months = ref<OptionalItem>({})
 // 可选日期
 const optional_dates = ref<OptionalItem>({})
-// 全部数据
-const allRecords = ref<YMDRecords[]>([])
 // 展示数据
 const listRecords = ref<any[]>([])
 // 初始化可选项列表
 const initOptionItems = () => {
     getAllRecord()
         .then(ymd_records => {
+            allRecords.value = ymd_records
             const [ years, months, dates ]: { [k: string]: boolean }[] = [ {}, {}, {} ]
             ymd_records.forEach(({ year, month, date }) => {
                 years[year] = true
@@ -32,6 +31,35 @@ const initOptionItems = () => {
             optional_dates.value = dates
         })
 }
+// 全选 全不选 快捷操作
+const doOperate = (selectAll: boolean) => {
+    for (let year in optional_years.value) {
+        optional_years.value[year] = selectAll
+    }
+    for (let month in optional_months.value) {
+        optional_months.value[month] = selectAll
+    }
+    for (let date in optional_dates.value) {
+        optional_dates.value[date] = selectAll
+    }
+    doFilter()
+}
+// 筛选
+const doFilter = () => {
+    const _all: YMDRecords[] = JSON.parse(JSON.stringify(allRecords.value))
+    const filteredYears = Object.keys(optional_years.value).filter(y => optional_years.value[y])
+    const filteredMonths = Object.keys(optional_months.value).filter(m => optional_years.value[m])
+    const filteredDates = Object.keys(optional_dates.value).filter(d => optional_years.value[d])
+
+    listRecords.value = _all
+        .filter(ymd => {
+            return filteredYears.includes(ymd.year)
+                || filteredMonths.includes(ymd.month)
+                || filteredDates.includes(ymd.date)
+        })
+        .map(ymd => ymd.records)
+        .flat(1)
+}
 // endregion
 
 onMounted(() => {
@@ -42,6 +70,11 @@ onMounted(() => {
 <template>
     <view class="output-page">
         <view class="filter-box">
+            <view class="operate-box">
+                <view class="operate-btn" @tap="doOperate(true)">全选</view>
+                <view class="operate-btn" @tap="doOperate(false)">全不选</view>
+                <view class="operate-btn" @tap="doFilter">筛选</view>
+            </view>
             <view class="pick-box">
                 <text class="label">选择年</text>
                 <scroll-view class="item-box" :scroll-x="true">
@@ -78,6 +111,7 @@ onMounted(() => {
             years: {{ optional_years }} <br>
             months: {{ optional_months }} <br>
             dates: {{ optional_dates }} <br>
+            {{ listRecords }}
         </view>
     </view>
 </template>
@@ -97,12 +131,52 @@ onMounted(() => {
 
     .filter-box {
         position: relative;
-        width: 100%;
-        height: 6rem;
+        width: calc(100% - 1rem);
+        height: 10rem;
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+        box-shadow: 5px 5px 5px #ddd;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: space-between;
+
+        .filter-title {
+            position: relative;
+            width: calc(100% - 1.5rem);
+            height: 1rem;
+            padding: 0 0.75rem;
+            color: #777;
+            line-height: 1rem;
+            text-align: end;
+        }
+
+        .operate-box {
+            position: relative;
+            width: 100%;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+
+            .operate-btn {
+                position: relative;
+                width: fit-content;
+                height: 1.5rem;
+                padding: 0 14px;
+                border: solid 1px #aaa;
+                border-radius: 0.75rem;
+                color: #777;
+                box-sizing: border-box;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                &:not(:last-child) {
+                    margin-right: 0.5rem;
+                }
+            }
+        }
 
         .pick-box {
             position: relative;

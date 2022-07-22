@@ -82,7 +82,7 @@ onMounted(() => {
             <NutButton size="mini" @tap="syncStorageInfo(true)">
                 {{ detectState === 'free' ? '重新检测' : '检测中 . .' }}
             </NutButton>
-            <NutButton size="mini" @tap="jumpTo('output')">日志管理</NutButton>
+            <NutButton size="mini" @tap="jumpTo('overview')">日志管理</NutButton>
         </view>
     </view>
 </template>

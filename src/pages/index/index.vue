@@ -217,6 +217,10 @@ onMounted(() => {
             box-shadow: none;
             border-bottom: solid 1px #eee;
             color: #777;
+
+            .nut-cell__value {
+                color: #777;
+            }
         }
 
         .note-box {

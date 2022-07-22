@@ -66,6 +66,12 @@ const generateDateTree = () => {
     return [ lastYear, thisYear ]
 }
 
+const get_ddMMss = (t: number) => {
+    const d = new Date(t)
+    return `${ d.getHours().toString().padStart(2, '0') }:${ d.getMinutes().toString().padStart(2, '0') }:${ d.getSeconds().toString().padStart(2, '0') }`
+}
+
 export {
-    generateDateTree
+    generateDateTree,
+    get_ddMMss
 }

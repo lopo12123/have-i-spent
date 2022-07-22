@@ -10,6 +10,7 @@ import {
 import { DayRecord, getDateIdx, getMonthRecord, insertOrCreate } from "../../scripts/store";
 import StorageInfo from "../../components/StorageInfo.vue";
 import { hideLoading, showLoading, showToast } from "@tarojs/taro";
+import { get_ddMMss } from "../../scripts/day";
 
 // region 日期选择器 级联
 const weekDays = [ '星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六' ]
@@ -59,19 +60,28 @@ const addNewRecord = () => {
         })
     }
     else {
-        insertOrCreate(newValue.value, newNote.value)
-            .then(if_success => {
-                showToast({
-                    title: if_success ? '记录成功' : '记录失败',
-                    icon: 'success'
+        const newVal = newValue.value
+        if(/^-?[0-9]+(.[0-9]+)?$/.test(newVal) && !isNaN(Number(newVal))) {
+            insertOrCreate(newValue.value, newNote.value)
+                .then(if_success => {
+                    showToast({
+                        title: if_success ? '记录成功' : '记录失败',
+                        icon: 'success'
+                    })
+                    if(if_success) {
+                        // 记录成功后清空输入区域
+                        resetRecordItem(false)
+                        // 记录后 更新列表
+                        syncRecords(undefined, undefined, false)
+                    }
                 })
-                if(if_success) {
-                    // 记录成功后清空输入区域
-                    resetRecordItem(false)
-                    // 记录后 更新列表
-                    syncRecords(undefined, undefined, false)
-                }
+        }
+        else {
+            showToast({
+                title: '错误金额',
+                icon: 'error'
             })
+        }
     }
 }
 // endregion
@@ -161,7 +171,7 @@ onMounted(() => {
                     <text class="value">{{ item.v }}</text>
                     <text class="note">{{ item.n }}</text>
                     <text class="timestamp">
-                        {{ new Date(parseInt(item.t + '')).toLocaleTimeString('zh-cn', {hour12: false}) }}
+                        {{ get_ddMMss(parseInt(item.t + '')) }}
                     </text>
                 </view>
                 <view v-if="recordList.length === 0" class="empty-text">

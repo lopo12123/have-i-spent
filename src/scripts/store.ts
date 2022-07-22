@@ -181,6 +181,7 @@ const clearAllRecords = () => {
 }
 
 export {
+    getDateIdx,
     getMonthRecord,
     getYearRecord,
     insertOrCreate,

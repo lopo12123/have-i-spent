@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import {
     Button as NutButton,
     Cell as NutCell,
@@ -7,7 +7,7 @@ import {
     Input as NutInput,
     DatePicker
 } from "@nutui/nutui-taro";
-import { DayRecord, getMonthRecord } from "../../scripts/store";
+import { DayRecord, getDateIdx, getMonthRecord, insertOrCreate } from "../../scripts/store";
 import StorageInfo from "../../components/StorageInfo.vue";
 import { hideLoading, showLoading, showToast } from "@tarojs/taro";
 
@@ -58,27 +58,40 @@ const addNewRecord = () => {
         })
     }
     else {
-        console.log(`添加新纪录: ${ newValue.value }, ${ newNote.value }`)
+        insertOrCreate(newValue.value, newNote.value)
+            .then(if_success => {
+                if(if_success) resetRecordItem()
+                showToast({
+                    title: if_success ? '记录成功' : '记录失败',
+                    icon: 'success'
+                })
+            })
     }
 }
 // endregion
 
+// region 记录展示
 const recordList = ref<DayRecord>([])
 const recordState = ref<'free' | 'block'>('free')
-const syncRecords = (ym: string, day: string) => {
+const syncRecords = (ym: string, date: string) => {
     showLoading({
-        title: `查询中`,
+        title: '查询中',
         mask: true,
         complete: () => {
             getMonthRecord(ym)
                 .then(records => {
-                    recordList.value = records?.[day] ?? []
+                    recordList.value = records?.[date] ?? []
                     hideLoading()
                 })
-            console.log('展示: ', ym, day)
         }
     })
 }
+// endregion
+
+onMounted(() => {
+    // 进入页面自动同步一次
+    syncRecords(getDateIdx('ym'), getDateIdx('date'))
+})
 </script>
 
 <template>

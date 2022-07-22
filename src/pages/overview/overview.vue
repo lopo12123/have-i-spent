@@ -1,6 +1,7 @@
 <script lang="ts" setup>
-import { onMounted, ref } from "vue";
-import { getAllRecord, insertOrCreate, YMDRecords } from "../../scripts/store";
+import { computed, onMounted, ref } from "vue";
+import { List as NutList } from "@nutui/nutui-taro";
+import { getAllRecord, SingleRecord, YMDRecords } from "../../scripts/store";
 
 type OptionalItem = { [value: string]: boolean }
 
@@ -14,22 +15,35 @@ const optional_months = ref<OptionalItem>({})
 // 可选日期
 const optional_dates = ref<OptionalItem>({})
 // 展示数据
-const listRecords = ref<any[]>([])
+const recordList = ref<SingleRecord[]>([])
+const in_out = computed(() => {
+    const [ i, o ] = recordList.value
+        .reduce(([ prev_i, prev_o ], curr) => {
+            const v = parseFloat(curr.v + '')
+            return v > 0 ? [ prev_i + v, prev_o ] : [ prev_i, prev_o - v ]
+        }, [ 0, 0 ])
+
+    return [ i, o ]
+})
 // 初始化可选项列表
 const initOptionItems = () => {
-    getAllRecord()
-        .then(ymd_records => {
-            allRecords.value = ymd_records
-            const [ years, months, dates ]: { [k: string]: boolean }[] = [ {}, {}, {} ]
-            ymd_records.forEach(({ year, month, date }) => {
-                years[year] = true
-                months[month] = true
-                dates[date] = true
+    return new Promise(resolve => {
+        getAllRecord()
+            .then(ymd_records => {
+                allRecords.value = ymd_records
+                const [ years, months, dates ]: { [k: string]: boolean }[] = [ {}, {}, {} ]
+                ymd_records.forEach(({ year, month, date }) => {
+                    years[year] = true
+                    months[month] = true
+                    dates[date] = true
+                })
+                optional_years.value = years
+                optional_months.value = months
+                optional_dates.value = dates
+
+                resolve(true)
             })
-            optional_years.value = years
-            optional_months.value = months
-            optional_dates.value = dates
-        })
+    })
 }
 // 全选 全不选 快捷操作
 const doOperate = (selectAll: boolean) => {
@@ -51,7 +65,7 @@ const doFilter = () => {
     const filteredMonths = Object.keys(optional_months.value).filter(m => optional_years.value[m])
     const filteredDates = Object.keys(optional_dates.value).filter(d => optional_years.value[d])
 
-    listRecords.value = _all
+    recordList.value = _all
         .filter(ymd => {
             return filteredYears.includes(ymd.year)
                 || filteredMonths.includes(ymd.month)
@@ -64,16 +78,25 @@ const doFilter = () => {
 
 onMounted(() => {
     initOptionItems()
+        .then(() => {
+            doFilter()
+        })
 })
 </script>
 
 <template>
     <view class="output-page">
         <view class="filter-box">
-            <view class="operate-box">
-                <view class="operate-btn" @tap="doOperate(true)">全选</view>
-                <view class="operate-btn" @tap="doOperate(false)">全不选</view>
-                <view class="operate-btn" @tap="doFilter">筛选</view>
+            <view class="filter-title">
+                共
+                {{ recordList.length }}
+                条记录 (收
+                {{ in_out[0].toFixed(2) }}
+                , 支
+                {{ in_out[1].toFixed(2) }}
+                , 合计
+                {{ (in_out[0] - in_out[1]).toFixed(2) }}
+                )
             </view>
             <view class="pick-box">
                 <text class="label">选择年</text>
@@ -105,13 +128,32 @@ onMounted(() => {
                     </view>
                 </scroll-view>
             </view>
+            <view class="operate-box">
+                <view class="operate-btn default" @tap="doOperate(true)">全选</view>
+                <view class="operate-btn default" @tap="doOperate(false)">全不选</view>
+                <view class="operate-btn confirm" @tap="doFilter">条件筛选</view>
+            </view>
         </view>
 
-        <view class="overview-box">
-            years: {{ optional_years }} <br>
-            months: {{ optional_months }} <br>
-            dates: {{ optional_dates }} <br>
-            {{ listRecords }}
+        <view class="list-or-note">
+            <NutList v-if="recordList.length > 0"
+                     class="infinite-list"
+                     :height="32"
+                     :list-data="recordList">
+                <template v-slot="{index, item}">
+                    <view class="list-row">
+                        <text class="index">{{ index + 1 }}</text>
+                        <text class="value">{{ item.v }}</text>
+                        <text class="note">{{ item.n }}</text>
+                        <text class="timestamp">
+                            {{ new Date(parseInt(item.t + '')).toLocaleTimeString('zh-cn', {hour12: false}) }}
+                        </text>
+                    </view>
+                </template>
+            </NutList>
+            <view v-if="recordList.length === 0" class="empty-text">
+                这段时间没花钱, 好好反思一下
+            </view>
         </view>
     </view>
 </template>
@@ -127,8 +169,9 @@ onMounted(() => {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: space-evenly;
 
+    // 11rem
     .filter-box {
         position: relative;
         width: calc(100% - 1rem);
@@ -143,12 +186,10 @@ onMounted(() => {
 
         .filter-title {
             position: relative;
-            width: calc(100% - 1.5rem);
+            width: 100%;
             height: 1rem;
-            padding: 0 0.75rem;
             color: #777;
             line-height: 1rem;
-            text-align: end;
         }
 
         .operate-box {
@@ -164,9 +205,7 @@ onMounted(() => {
                 width: fit-content;
                 height: 1.5rem;
                 padding: 0 14px;
-                border: solid 1px #aaa;
                 border-radius: 0.75rem;
-                color: #777;
                 box-sizing: border-box;
                 display: flex;
                 align-items: center;
@@ -175,6 +214,16 @@ onMounted(() => {
                 &:not(:last-child) {
                     margin-right: 0.5rem;
                 }
+            }
+
+            .default {
+                border: solid 1px #aaa;
+                color: #777;
+            }
+
+            .confirm {
+                border: solid 1px #00cd65cc;
+                color: #00cd65;
             }
         }
 
@@ -223,6 +272,60 @@ onMounted(() => {
                     color: #212121;
                 }
             }
+        }
+    }
+
+    .list-or-note {
+        position: relative;
+        width: calc(100% - 1rem);
+        height: calc(100% - 14rem);
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+        box-shadow: 5px 5px 5px #ddd;
+
+        .infinite-list {
+            .nut-list-item {
+                margin: 0;
+                border-bottom: solid 1px #eee;
+            }
+
+            .list-row {
+                position: relative;
+                width: 100%;
+                height: 100%;
+                color: #333;
+                display: flex;
+                align-items: center;
+                justify-content: space-evenly;
+
+
+                .index {
+                    width: 1rem;
+                }
+
+                .value {
+                    width: 3rem;
+                }
+
+                .note {
+                    width: calc(100% - 10rem);
+                }
+
+                .timestamp {
+                    width: 4rem;
+                    color: #777;
+                    font-style: italic;
+                }
+            }
+        }
+
+        .empty-text {
+            position: relative;
+            width: 100%;
+            height: 3rem;
+            color: #7778;
+            line-height: 3rem;
+            text-align: center;
         }
     }
 }

@@ -137,6 +137,7 @@ onMounted(() => {
         <view class="list-or-note">
             <NutList v-if="recordList.length > 0"
                      class="infinite-list"
+                     style="height: 100%"
                      :height="32"
                      :list-data="recordList">
                 <template v-slot="{index, item}">
@@ -298,6 +299,10 @@ onMounted(() => {
         box-shadow: 5px 5px 5px #ddd;
 
         .infinite-list {
+            position: relative;
+            width: 100%;
+            height: 100%;
+
             .nut-list-item {
                 margin: 0;
                 border-bottom: solid 1px #eee;

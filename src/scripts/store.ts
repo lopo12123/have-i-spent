@@ -17,6 +17,10 @@ export type SingleRecord = {
      * @description note
      */
     n: string
+    /**
+     * @description tags
+     */
+    g: string
 }
 /**
  * @description records of a day
@@ -48,7 +52,7 @@ export type YMDRecords = {
 const getDateIdx = (type: 'date' | 'month' | 'year' | 'ym'): string => {
     const d = new Date()
 
-    switch(type) {
+    switch (type) {
         case 'date':
             return d.getDate().toString()
         case 'month':
@@ -144,10 +148,11 @@ const getAllRecord = () => {
  * @description insert a new record into storage
  * @param v value
  * @param n note
+ * @param g tag
  * @return boolean if success
  */
-const insertOrCreate = (v: number, n: string = '') => {
-    const new_record: SingleRecord = { t: Date.now(), v, n }
+const insertOrCreate = (v: number, n: string = '', g: string = '') => {
+    const new_record: SingleRecord = { t: Date.now(), v, n, g }
 
     return new Promise<boolean>(resolve => {
         getMonthRecord()

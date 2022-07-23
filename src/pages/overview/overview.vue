@@ -14,10 +14,9 @@ const optional_years = ref<OptionalItem>({})
 const optional_months = ref<OptionalItem>({})
 // 可选日期
 const optional_dates = ref<OptionalItem>({})
-// 金额范围
-// const value_range = ref()
 // 展示数据
 const recordList = ref<SingleRecord[]>([])
+// 统计
 const in_out = computed(() => {
     const [ i, o ] = recordList.value
         .reduce(([ prev_i, prev_o ], curr) => {
@@ -69,7 +68,7 @@ const doFilter = () => {
 
     recordList.value = _all
         .filter(ymd => {
-            return filteredYears.includes(ymd.year + '') || filteredMonths.includes(ymd.month + '') || filteredDates.includes(ymd.date + '')
+            return filteredYears.includes(ymd.year + '') && filteredMonths.includes(ymd.month + '') && filteredDates.includes(ymd.date + '')
         })
         .map(ymd => ymd.records)
         .flat(1)
@@ -128,14 +127,6 @@ onMounted(() => {
                     </view>
                 </scroll-view>
             </view>
-<!--            <view class="pick-box">-->
-<!--                <text class="label">金额量</text>-->
-<!--                <view class="item-box">-->
-<!--                    <text>大于</text>-->
-<!--                    <input type="number">-->
-<!--                    <text>小于</text>-->
-<!--                </view>-->
-<!--            </view>-->
             <view class="operate-box">
                 <view class="operate-btn none" @tap="doOperate(false)">全不选</view>
                 <view class="operate-btn all" @tap="doOperate(true)">全选</view>
@@ -284,6 +275,16 @@ onMounted(() => {
                     background-color: #f0f0f0;
                     color: #212121;
                 }
+            }
+
+            .range-box {
+                position: relative;
+                width: calc(100% - 3rem);
+                height: 1.5rem;
+                white-space: nowrap;
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
             }
         }
     }

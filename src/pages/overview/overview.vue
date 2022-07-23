@@ -2,7 +2,7 @@
 import { computed, onMounted, ref } from "vue";
 import { List as NutList } from "@nutui/nutui-taro";
 import { getAllRecord, SingleRecord, YMDRecords } from "../../scripts/store";
-import { get_ddMMss } from "../../scripts/day";
+import { get_hhMMss } from "../../scripts/day";
 
 type OptionalItem = { [value: string]: boolean }
 
@@ -147,7 +147,7 @@ onMounted(() => {
                         <text class="value">{{ item.v }}</text>
                         <text class="note">{{ item.n }}</text>
                         <text class="timestamp">
-                            {{ get_ddMMss(parseInt(item.t + '')) }}
+                            {{ get_hhMMss(parseInt(item.t + '')) }}
                         </text>
                     </view>
                 </template>

@@ -66,12 +66,18 @@ const generateDateTree = () => {
     return [ lastYear, thisYear ]
 }
 
-const get_ddMMss = (t: number) => {
+const get_yyyyMMdd = (t: number) => {
+    const d = new Date(t)
+    return `${ d.getFullYear() }-${ (d.getMonth() + 1).toString().padStart(2, '0') }-${ d.getDate().toString().padStart(2, '0') }`
+}
+
+const get_hhMMss = (t: number) => {
     const d = new Date(t)
     return `${ d.getHours().toString().padStart(2, '0') }:${ d.getMinutes().toString().padStart(2, '0') }:${ d.getSeconds().toString().padStart(2, '0') }`
 }
 
 export {
     generateDateTree,
-    get_ddMMss
+    get_yyyyMMdd,
+    get_hhMMss
 }

@@ -10,7 +10,7 @@ import {
 import { DayRecord, getDateIdx, getMonthRecord, insertOrCreate } from "../../scripts/store";
 import StorageInfo from "../../components/StorageInfo.vue";
 import { hideLoading, showLoading, showToast } from "@tarojs/taro";
-import { get_ddMMss } from "../../scripts/day";
+import { get_hhMMss, get_yyyyMMdd } from "../../scripts/day";
 import info from "../../../package.json"
 
 const version = ref(info.version)
@@ -21,7 +21,7 @@ const defaultDate = new Date()
 // 可见性
 const calendarVisible = ref(false)
 // 日历绑定日期
-const showDate = ref(new Date().toLocaleDateString().replace(/\//g, '-'))
+const showDate = ref(get_yyyyMMdd(Date.now()))
 // 展示星期几
 const showDay = ref(weekDays[new Date().getDay()])
 // 确认选择
@@ -175,7 +175,7 @@ onMounted(() => {
                     <text class="value">{{ item.v }}</text>
                     <text class="note">{{ item.n }}</text>
                     <text class="timestamp">
-                        {{ get_ddMMss(parseInt(item.t + '')) }}
+                        {{ get_hhMMss(parseInt(item.t + '')) }}
                     </text>
                 </view>
                 <view v-if="recordList.length === 0" class="empty-text">

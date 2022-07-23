@@ -11,6 +11,9 @@ import { DayRecord, getDateIdx, getMonthRecord, insertOrCreate } from "../../scr
 import StorageInfo from "../../components/StorageInfo.vue";
 import { hideLoading, showLoading, showToast } from "@tarojs/taro";
 import { get_ddMMss } from "../../scripts/day";
+import info from "../../../package.json"
+
+const version = ref(info.version)
 
 // region 日期选择器 级联
 const weekDays = [ '星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六' ]
@@ -181,6 +184,10 @@ onMounted(() => {
             </view>
         </view>
 
+        <view class="copyright">
+            <text>v {{ version }}</text>
+        </view>
+
         <NumberKeyboard
             type="rightColumn"
             confirm-text="确认"
@@ -209,7 +216,7 @@ onMounted(() => {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-evenly;
+    justify-content: space-between;
 
     // 5rem
     // StorageInfo
@@ -351,6 +358,19 @@ onMounted(() => {
                 text-align: center;
             }
         }
+    }
+
+    .copyright {
+        position: absolute;
+        z-index: 1;
+        width: 100%;
+        height: 1rem;
+        left: 0;
+        bottom: 0;
+        color: #777;
+        line-height: 1rem;
+        text-align: center;
+        font-style: italic;
     }
 }
 </style>

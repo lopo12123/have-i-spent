@@ -15,6 +15,8 @@ const optional_years = ref<OptionalItem>({})
 const optional_months = ref<OptionalItem>({})
 // 可选日期
 const optional_dates = ref<OptionalItem>({})
+// 收 / 支
+const optional_inout = ref<boolean[]>([ true, true ])
 // 展示数据
 const recordList = ref<SingleRecord[]>([])
 // 统计
@@ -58,6 +60,7 @@ const doOperate = (selectAll: boolean) => {
     for (let date in optional_dates.value) {
         optional_dates.value[date] = selectAll
     }
+    optional_inout.value = [ selectAll, selectAll ]
     doFilter()
 }
 // 筛选
@@ -73,6 +76,10 @@ const doFilter = () => {
         })
         .map(ymd => ymd.records)
         .flat(1)
+        .filter(x => {
+            return optional_inout.value[0] && x.v >= 0
+                || optional_inout.value[1] && x.v <= 0
+        })
 }
 // endregion
 
@@ -127,6 +134,19 @@ onMounted(() => {
                         {{ date }}日
                     </view>
                 </scroll-view>
+            </view>
+            <view class="pick-box">
+                <text class="label">收 / 支</text>
+                <view class="inout-box">
+                    <view :class="optional_inout[0] ? 'active' : 'default'"
+                          @tap="optional_inout[0] = !optional_inout[0]">
+                        收入
+                    </view>
+                    <view :class="optional_inout[1] ? 'active' : 'default'"
+                          @tap="optional_inout[1] = !optional_inout[1]">
+                        支出
+                    </view>
+                </view>
             </view>
             <view class="operate-box">
                 <view class="operate-btn none" @tap="doOperate(false)">全不选</view>
@@ -251,42 +271,41 @@ onMounted(() => {
                 width: calc(100% - 3rem);
                 height: 1.5rem;
                 white-space: nowrap;
-
-                %pick-item {
-                    position: relative;
-                    width: fit-content;
-                    height: 1.5rem;
-                    padding: 0 14px;
-                    border-radius: 0.75rem;
-                    line-height: 1.5rem;
-                    display: inline-block;
-
-                    &:not(:last-child) {
-                        margin-right: 8px;
-                    }
-                }
-
-                .active {
-                    @extend %pick-item;
-                    background-color: #00cd65cc;
-                    color: #fff;
-                }
-
-                .default {
-                    @extend %pick-item;
-                    background-color: #f0f0f0;
-                    color: #212121;
-                }
             }
 
-            .range-box {
+            .inout-box {
                 position: relative;
                 width: calc(100% - 3rem);
                 height: 1.5rem;
-                white-space: nowrap;
                 display: flex;
                 align-items: center;
                 justify-content: flex-start;
+            }
+
+            %pick-item {
+                position: relative;
+                width: fit-content;
+                height: 1.5rem;
+                padding: 0 14px;
+                border-radius: 0.75rem;
+                line-height: 1.5rem;
+                display: inline-block;
+
+                &:not(:last-child) {
+                    margin-right: 8px;
+                }
+            }
+
+            .active {
+                @extend %pick-item;
+                background-color: #00cd65cc;
+                color: #fff;
+            }
+
+            .default {
+                @extend %pick-item;
+                background-color: #f0f0f0;
+                color: #212121;
             }
         }
     }
